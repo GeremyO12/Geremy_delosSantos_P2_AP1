@@ -8,6 +8,5 @@ public class Contexto : DbContext
 {
     public Contexto(DbContextOptions<Contexto> options) : base(options) { }
 
-    public virtual DbSet<Modelo> Modelo { get; set; }
-
+    public DbSet<Modelo> Modelo { get; set; }
 }
