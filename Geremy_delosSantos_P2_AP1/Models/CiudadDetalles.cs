@@ -2,7 +2,7 @@
 
 namespace Geremy_delosSantos_P2_AP1.Models;
 
-public class Ciudades
+public class CiudadDetalles
 {
     [Key]
     public int CiudadId { get; set; }
