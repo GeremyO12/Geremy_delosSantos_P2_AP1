@@ -1,5 +1,70 @@
-﻿<h3>Edit</h3>
+﻿@page "/Modelo/Edit/{id:int}"
+@rendermode InteractiveServer
+@inject ModeloServices modeloServices
+@inject NavigationManager navigationManager
+
+<PageTitle>Crear Edit</PageTitle>
+<EditForm Model="modelo" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h5 class="card-title">Editar Modelo<i class="bi bi-person-fill-gear"></i></h5>
+            </div>
+
+            <div class="card-body">
+                @*ModeloId*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>ModeloId</strong></label>
+                    <InputNumber class="form-control" @bind-Value="modelo.ModeloId" readonly />
+                </div>
+                @*Asignatura*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Asignatura</strong></label>
+                    <InputText class="form-control" @bind-Value="modelo.Asignatura" />
+                    <ValidationMessage For="@(() => modelo.Asignatura)" />
+                </div>
+                @*Fecha*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Fecha</strong></label>
+                    <InputDate class="form-control" @bind-Value="modelo.Fecha" />
+                    <ValidationMessage For="@(() => modelo.Fecha)" />
+                </div>
+                @*Monto*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Monto</strong></label>
+                    <InputNumber class="form-control" @bind-Value="modelo.Monto" />
+                    <ValidationMessage For="@(() => modelo.Monto)" />
+                </div>
+
+            </div>
+
+            @*Footer*@
+            <div class="card-footer text-center mt-2">
+                <a href="/ingresos" class="btn btn-secondary">
+                    <span class="bi bi-arrow-left"></span> Volver
+                </a>
+                <button type="submit" class="btn btn-primary bi bi-floppy"> Guardar</button>
+            </div>
+        </div>
+    </div>
+
+</EditForm>
 
 @code {
+    [Parameter] public int id { get; set; }
+    Modelo modelo { get; set; } = new();
 
+    protected override async Task OnInitializedAsync()
+    {
+        modelo.Fecha = DateTime.Now;
+        modelo = await modeloServices.Buscar(id) ?? new();
+    }
+
+    private async Task Guardar()
+    {
+        await modeloServices.Guardar(modelo);
+        navigationManager.NavigateTo("/Modelo");
+    }
 }

@@ -1,5 +1,77 @@
-﻿<h3>Create</h3>
+﻿@page "/Modelo/Create"
+@rendermode InteractiveServer
+@inject ModeloServices modeloServices
+@inject NavigationManager navigationManager
+
+<PageTitle>Crear Modelo</PageTitle>
+<EditForm Model="modelo" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h5 class="card-title">Crear Encuesta<i class="bi bi-person-fill-gear"></i></h5>
+            </div>
+
+            <div class="card-body">
+                @*ModeloId*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>ModeloId</strong></label>
+                    <InputNumber class="form-control" @bind-Value="modelo.ModeloId"/>
+                    <ValidationMessage For="@(() => modelo.ModeloId)" />
+                </div>
+                @*Asignatura*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Asignatura</strong></label>
+                    <InputText class="form-control" @bind-Value="modelo.Asignatura" />
+                    <ValidationMessage For="@(() => modelo.Asignatura)" />
+                </div>
+                @*Fecha*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Fecha</strong></label>
+                    <InputDate class="form-control" @bind-Value="modelo.Fecha" />
+                    <ValidationMessage For="@(() => modelo.Fecha)" />
+                </div>
+                @*Monto*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Monto</strong></label>
+                    <InputNumber class="form-control" @bind-Value="modelo.Monto" />
+                    <ValidationMessage For="@(() => modelo.Monto)" />
+                </div>
+
+            </div>
+
+            @*Footer*@
+            <div class="card-footer bg-light d-flex justify-content-center mt-3">
+                <div class="btn-group">
+                    @*Boton Nuevo*@
+                    <button type="button" class="btn btn-outline-primary ml-2" @onclick="Nuevo"><span class="bi bi-plus"></span> Nuevo </button>
+                    @*Boton Guardar*@
+                    <button type="submit" class="btn btn-outline-success ml-2"><span class="bi bi-check-circle-fill"></span> Guardar </button>
+                    @*Boton Retroceder*@
+                    <a type="button" href="/Modelo/Index/" class="btn btn-outline-danger"><span class="bi bi-arrow-bar-left"></span> Retroceder </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</EditForm>
 
 @code {
+    public Modelo modelo { get; set; } = new Modelo();
 
+    protected override async Task OnInitializedAsync()
+    {
+        modelo.Fecha = DateTime.Now;
+    }
+
+    public void Nuevo()
+    {
+        modelo = new Modelo();
+    }
+    private async Task Guardar()
+    {
+        await modeloServices.Guardar(modelo);
+        navigationManager.NavigateTo("/Modelo");
+    }
 }

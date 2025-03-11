@@ -1,5 +1,135 @@
-﻿<h3>Index</h3>
+﻿@page "/Modelo/Index"
+@rendermode InteractiveServer
+@inject ModeloServices modeloServices 
+@using System.Linq.Expressions;
+
+<PageTitle> Encuesta</PageTitle>
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header space-between">
+            <h5 class="card-title text-center">Encuesta</h5>
+            <a href="/Modelo/Create" class="btn btn-primary"> <span class="bi bi-plus-square bi-trask mt-3"></span> Crear</a>
+        </div>
+
+        <div class="card-body">
+
+            @*labels*@
+            <div class="row">
+
+                @*Filtrar por*@
+                <div class="col-3">
+                    <label class="col-form-label"><strong>Filtrar por</strong></label>
+                </div>
+
+                @*ValorFiltro*@
+                <div class="col-4">
+                    <label class="col-form-label"><strong>B&uacute;squeda</strong></label>
+                </div>
+            </div>
+
+            @*Inputs y botones*@
+            <div class="row align-items-center">
+                @*filtro Arreglar*@
+                <div class="col-3">
+                    <InputSelect class="form-select" @bind-Value="Filtro">
+                        <option value="" selected disabled>Elija una opci&oacute;n</option>
+                        <option value="Id">Id</option>
+                        <option value="Nombrre">Nombre</option>
+                        <option value="Monto">Monte</option>
+                    </InputSelect>
+                </div>
+
+                @*Busqueda*@
+                <div class="col-4">
+                    <div class="input-group">
+                        <input class="form-control" @bind="ValorFiltro" placeholder="Buscar" />
+                        <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="Buscar"> Search</button>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-striped table-hover">
+                <thead class="table text-black">
+                    <tr>
+                        <th>Id</th>
+                        <th>Fecha</th>
+                        <th>Asignatura</th>
+                        <th>Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var modelo in listaModelo)
+                    {
+                        <tr>
+                            @*Detalle*@
+                            <td> @modelo.ModeloId</td>
+                            <td> @modelo.Fecha</td>
+                            <td> @modelo.Asignatura</td>
+                            <td> @modelo.Monto</td>
+
+                            @*Boton Editar*@
+                            <td class="text-center">
+                                <a href="Modelo/Edit/@modelo.ModeloId" class="btn btn-outline-primary bi bi-pencil-square"></a>
+                            </td>
+
+                            @*Botn Eliminar*@
+                            <td class="text-center">
+                                <button class="btn btn-outline-danger bi bi-trash" @onclick="() => Eliminar(modelo.ModeloId)"></button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+            <span class="fw-bold">Monto: @listaModelo.Count()</span>
+            <span class="fw-bold">Monto Total: @listaModelo.Sum(i => i.Monto).ToString("n2")</span>
+        </div>
+    </div>
+</div>
+
 
 @code {
+    List<Modelo> listaModelo = new();
+    public string Filtro { get; set; } = string.Empty;
+    public string ValorFiltro { get; set; } = string.Empty;
 
+    protected override async Task OnInitializedAsync()
+    {
+        await Buscar();
+    }
+
+    public async Task Buscar()
+    {
+        Expression<Func<Modelo, bool>> query = (i => i.ModeloId > 0);
+
+        if (Filtro == "Id")
+        {
+            try
+            {
+                int id = Convert.ToInt32(ValorFiltro);
+                query = (i => i.ModeloId == id);
+            }
+            catch (Exception e)
+            {
+                query = (i => i.ModeloId > 0);
+            }
+
+        }
+        else if (Filtro == "Asignatura")
+        {
+            query = ((i => i.Asignatura.Contains(ValorFiltro)));
+        }
+        else if (string.IsNullOrEmpty(ValorFiltro))
+        {
+            query = (i => i.ModeloId > 0);
+        }
+        listaModelo = await modeloServices.Listar(query);
+    }
+
+    public async Task Eliminar(int id)
+    {
+        await modeloServices.Eliminar(id);
+        listaModelo = await modeloServices.Listar(i => i.ModeloId > 0);
+    }
 }
